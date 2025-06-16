@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: cargo-mirror-nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./volumes/crates:/var/www/html
+      - ./volumes/certs:/etc/letsencrypt:ro
+      - ./volumes/certbot_www:/var/www/certbot
+      - ./nginx/custom-init.sh:/docker-entrypoint.d/40-custom-init.sh:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - CACHE_MAX_SIZE=${CACHE_MAX_SIZE:-10g}
+    command: ["nginx", "-g", "daemon off;"]
+
+  certbot:
+    image: certbot/certbot
+    container_name: cargo-mirror-certbot
+    volumes:
+      - ./volumes/certs:/etc/letsencrypt
+      - ./volumes/certbot_www:/var/www/certbot
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - EMAIL=${EMAIL}
+    entrypoint: "/bin/sh -c '\
+      trap exit TERM; \
+      if [ ! -d /etc/letsencrypt/live/$${DOMAIN_NAME} ]; then \
+        certbot certonly --non-interactive \
+          --webroot -w /var/www/certbot \
+          --email $${EMAIL} -d $${DOMAIN_NAME} \
+          --rsa-key-size 4096 --agree-tos --force-renewal; \
+      fi; \
+      while :; do \
+        certbot renew; \
+        sleep 12h & wait $${!}; \
+      done;'"
+    depends_on:
+      - nginx

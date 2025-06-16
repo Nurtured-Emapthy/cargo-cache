@@ -1,0 +1,62 @@
+proxy_cache_path /var/www/html/cache levels=1:2 keys_zone=crates_cache:10m max_size=${CACHE_MAX_SIZE} inactive=60d use_temp_path=off;
+
+server {
+    listen 80;
+    server_name ${DOMAIN_NAME};
+    
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+    
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name ${DOMAIN_NAME};
+    
+    ssl_certificate /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem;
+    
+    location / {
+        root /var/www/html;
+        index index.html;
+        try_files $uri $uri/ =404;
+    }
+    
+    # Proxy requests to crates.io
+    location ~ ^/api/v1/crates {
+        proxy_pass https://crates.io;
+        proxy_set_header Host crates.io;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache crates_cache;
+        proxy_cache_bypass $http_upgrade;
+        proxy_buffering on;
+        proxy_cache_valid 200 1d;
+        proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+    }
+    
+    # Serve crate files
+    location ~ ^/crates {
+        root /var/www/html;
+        try_files $uri @crates_proxy;
+    }
+    
+    location @crates_proxy {
+        proxy_pass https://crates.io;
+        proxy_set_header Host crates.io;
+        proxy_ssl_server_name on;
+        proxy_cache crates_cache;
+        proxy_cache_revalidate on;
+        proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+        proxy_cache_lock on;
+        proxy_cache_valid 200 60d;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 60s;
+        proxy_send_timeout 60s;
+    }
+}

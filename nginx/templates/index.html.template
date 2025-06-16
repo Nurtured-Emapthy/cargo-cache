@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rust Crates Mirror - ${DOMAIN_NAME}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #000;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rust Crates Mirror</h1>
+    <p>This is a mirror for Rust crates. To use this mirror, add the following to your <code>.cargo/config.toml</code> file:</p>
+    <pre><code>[source.crates-io]
+replace-with = "mirror"
+
+[source.mirror]
+registry = "https://${DOMAIN_NAME}/api/v1/crates"
+</code></pre>
+</body>
+</html>
