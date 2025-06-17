@@ -32,6 +32,7 @@ server {
         proxy_cache_valid 200 302 1d;
         proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
 
+        proxy_ssl_server_name on;
         proxy_pass https://index.crates.io;
     }
 
