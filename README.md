@@ -7,7 +7,7 @@ A Docker Compose project for mirroring Rust crates using Nginx with Let's Encryp
 This project creates a mirror for Rust crates that can be used as an alternative registry for Cargo. It uses a custom entrypoint script to dynamically configure the server based on domain name. You *must* modify the .env file to configure the system and agree to Let's Encrypt's [terms of service](https://community.letsencrypt.org/tos) before it will run.
 
 This project currently requires:
-* Full access to ports 80 and 443 on the host because of Let's Encrypt. If you are running another web server, this project won't work in its current state.
+* Full access to ports 80 and 443 on the host because of Let's Encrypt
 * A custom domain for this project
 * The ability for Let's Encrypt to access this project at the custom domain
 
