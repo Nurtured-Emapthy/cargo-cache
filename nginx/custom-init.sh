@@ -1,23 +1,19 @@
 #!/bin/sh
 set -e
 
-# Configuration
-NGINX_WAIT=10  # Seconds to wait for certbot to use the webroot
-
-# Check if domain name is set
 if [ -z "$DOMAIN_NAME" ]; then
     echo "ERROR: DOMAIN_NAME environment variable is not set"
     exit 1
 fi
 
-# Check if domain name is still the default example value
 if [ "$DOMAIN_NAME" = "crates-mirror.example.com" ]; then
-    echo "ERROR: DOMAIN_NAME is still set to the example value. Please change it."
+    echo "ERROR: DOMAIN_NAME is still set to the example value."
+    echo "Please change it to allow certbot to generate a valid certificate."
     exit 1
 fi
 
 # Process templates
-cat /etc/nginx/templates/index.html.template | envsubst '${DOMAIN_NAME}' > /var/www/html/index.html
+cat /etc/nginx/templates/cargo-config.json.template | envsubst '${DOMAIN_NAME}' > /var/www/config.json
 
 # Check if SSL certificates exist
 if [ -d "/etc/letsencrypt/live/${DOMAIN_NAME}" ]; then

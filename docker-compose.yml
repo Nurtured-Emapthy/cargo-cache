@@ -8,7 +8,7 @@ services:
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/templates:/etc/nginx/templates:ro
-      - ./volumes/crates:/var/www/html
+      - ./volumes/crates:/var/cache/nginx/crates
       - ./volumes/certs:/etc/letsencrypt:ro
       - ./volumes/certbot_www:/var/www/certbot
       - ./nginx/custom-init.sh:/docker-entrypoint.d/40-custom-init.sh:ro
@@ -18,6 +18,7 @@ services:
     environment:
       - DOMAIN_NAME=${DOMAIN_NAME}
       - CACHE_MAX_SIZE=${CACHE_MAX_SIZE:-10g}
+      - NGINX_WAIT=${NGINX_WAIT}
     command: ["nginx", "-g", "daemon off;"]
 
   certbot:

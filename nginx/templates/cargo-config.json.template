@@ -1,0 +1,4 @@
+{
+  "dl": "https://${DOMAIN_NAME}/crates",
+  "api": "https://crates.io"
+}
