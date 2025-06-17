@@ -52,7 +52,7 @@ To use this mirror in your Rust projects, add the following to your `.cargo/conf
 replace-with = "mirror"
 
 [source.mirror]
-registry = "https://your-domain.example.com/api/v1/crates"
+registry = "sparse+https://your-domain.example.com/"
 ```
 
 ## How It Works
