@@ -6,7 +6,7 @@ if [ -z "$DOMAIN_NAME" ]; then
     exit 1
 fi
 
-if [ "$DOMAIN_NAME" = "crates-mirror.example.com" ]; then
+if [ "$DOMAIN_NAME" = "crates-cache.example.com" ]; then
     echo "ERROR: DOMAIN_NAME is still set to the example value."
     echo "Please change it to allow certbot to generate a valid certificate."
     exit 1

@@ -1,10 +1,10 @@
-# Cargo Mirror
+# Cargo Cache
 
-A Docker Compose project for mirroring Rust crates using Nginx with Let's Encrypt TLS certificates.
+A Docker Compose project for caching Rust crates using Nginx with Let's Encrypt TLS certificates.
 
 ## Overview
 
-This project creates a mirror for Rust crates that can be used as an alternative registry for Cargo. It uses a custom entrypoint script to dynamically configure the server based on domain name. You *must* modify the .env file to configure the system and agree to Let's Encrypt's [terms of service](https://community.letsencrypt.org/tos) before it will run.
+This project creates a cached mirror for Rust crates that can be used as an alternative registry for Cargo. It uses a custom entrypoint script to dynamically configure the server based on domain name. You *must* modify the .env file to configure the system and agree to Let's Encrypt's [terms of service](https://community.letsencrypt.org/tos) before it will run.
 
 This project currently requires:
 * Full access to ports 80 and 443 on the host because of Let's Encrypt
@@ -19,16 +19,22 @@ Please be mindful of [the risks](https://en.wikipedia.org/wiki/Supply_chain_atta
 
 1. Clone this repository:
    ```
-   git clone https://github.com/Nurtured-Emapthy/cargo-mirror.git
-   cd cargo-mirror
+   git clone https://github.com/Nurtured-Emapthy/cargo-cache.git
+   cd cargo-cache
    ```
 
 2. Configure settings in the `.env` file:
    ```
-   DOMAIN_NAME=your-domain.example.com
-   EMAIL=your-email@example.com
+   DOMAIN_NAME=crates-cache.example.com
+   EMAIL=admin@example.com
    CACHE_MAX_SIZE=10g
-   TOS=--agree-tos
+
+   # Seconds to wait for certbot to generate certs before restarting
+   NGINX_WAIT=30
+
+   # Uncomment if you agree to Let's Encrypt's Terms of Service
+   # https://community.letsencrypt.org/tos
+   #TOS=--agree-tos
    ```
 
 3. Start the services and watch for errors:
@@ -45,13 +51,13 @@ Please be mindful of [the risks](https://en.wikipedia.org/wiki/Supply_chain_atta
 
 ## Usage
 
-To use this mirror in your Rust projects, add the following to your `.cargo/config.toml` file either in your user's home folder (globally) or the root of your Rust project or workspace. Remember to modify it to use your domain name.
+To use this cache in your Rust projects, add the following to your `.cargo/config.toml` file either in your user's home folder (globally) or the root of your Rust project or workspace. Remember to modify it to use your domain name.
 
 ```toml
 [source.crates-io]
-replace-with = "mirror"
+replace-with = "cache"
 
-[source.mirror]
+[source.cache]
 registry = "sparse+https://your-domain.example.com/"
 ```
 
